@@ -8,7 +8,7 @@ const Moralis = require("moralis/node");
 
 // canvas for image compile
 const { createCanvas } = require("canvas");
-
+require("dotenv").config();
 
 // Moralis creds
 const serverUrl = process.env.SERVER_URL;

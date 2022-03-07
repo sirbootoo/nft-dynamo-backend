@@ -5,10 +5,12 @@ const multer = require("multer");
 const uploadDir = path.join(__dirname, '/input');
 const extractDir = path.join(__dirname, '/inputs');
 var cors = require('cors');
-
 const filesController = require("./app/controllers/files");
 
 const authMiddle = require("./app/middlewares/auth");
+
+
+require("dotenv").config();
 
 
 if (!fs.existsSync(uploadDir)) {
@@ -55,7 +57,7 @@ app.post('/upload', [authMiddle.verify, multer({ storage }).single('file')], fil
 app.get('/preview',[authMiddle.verify], filesController.preview);
 app.post('/generate', [authMiddle.verify], filesController.generateNFTs);
 
-app.listen(3000, (err) => {
+app.listen((process.env.PORT || 3000), (err) => {
     if (err) throw err;
     console.log("NFT Dynamo API running...");
 });
