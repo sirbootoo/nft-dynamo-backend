@@ -57,7 +57,7 @@ app.post('/upload', [authMiddle.verify, multer({ storage }).single('file')], fil
 app.get('/preview',[authMiddle.verify], filesController.preview);
 app.post('/generate', [authMiddle.verify], filesController.generateNFTs);
 
-app.listen((process.env.PORT || 3000), (err) => {
+app.listen((process.env.PORT || 3010), (err) => {
     if (err) throw err;
     console.log("NFT Dynamo API running...");
 });

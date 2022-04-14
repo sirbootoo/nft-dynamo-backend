@@ -17,7 +17,7 @@ const upload = (req, res) => {
 const preview = async (req, res) => {
     try {
         const { sesid } = req.headers
-        let payload = await NFTService.preview(sesID);
+        let payload = await NFTService.preview(sesid);
         let status = 200;
         if (!payload || (payload && payload.status === 0)) {
             res.statusCode = 400;
