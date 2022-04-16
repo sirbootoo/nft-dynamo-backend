@@ -7,6 +7,7 @@ yarn-error.log*
 lerna-debug.log*
 package-lock.json
 output/*
+input/*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -107,3 +108,6 @@ dist
 
 # Misc
 .DS_Store
+
+
+

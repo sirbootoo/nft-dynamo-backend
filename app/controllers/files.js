@@ -15,15 +15,40 @@ const upload = (req, res) => {
 }
 
 const preview = async (req, res) => {
+    const {
+        width,
+        height,
+        description,
+        editionSize,
+        layers,
+        rarities,
+        rarityPercentOptions } = req.body;
+    
+    let _width = Number(width),
+    _height = Number(height),
+    _editionSize = 1,
+    _layers = layers,
+    _rarities = rarities, 
+    { sesid } = req.headers,
+    _description = `${sesid} preview`;
+
+    console.log("sesID = ", sesid);
+
+    const data = {_width, _height, _description, _editionSize, _layers, _rarities, sesID: sesid};
+    console.log("\n\n", data, "<=============== Inside controller \n\n");
     try {
-        const { sesid } = req.headers
-        let payload = await NFTService.preview(sesid);
-        let status = 200;
+        let payload = await NFTService.generateNFTs(data);
         if (!payload || (payload && payload.status === 0)) {
             res.statusCode = 400;
         }
         res.json(payload);
     } catch (err) {
+        res.statusCode = 500;
+        res.json({
+            status: 0,
+            message: "Something went wrong",
+            err: err.message
+        });
         console.log("Error =============>", err, "<============ Error");
     }
 }

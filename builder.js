@@ -66,7 +66,8 @@ const startCreating = async (data = {_editionSize: 10}) => {
         editionCount,
         editionSize,
         rarityWeights,
-        imageDataArray
+        imageDataArray,
+        data.sesID
       );
     };
 
@@ -80,13 +81,14 @@ const startCreating = async (data = {_editionSize: 10}) => {
     apiKey,
     editionCount,
     editionSize,
-    imageDataArray
+    imageDataArray,
+    data.sesID
   );
 
   console.log();
   console.log("#########################################");
   console.log("Process Done");
-  console.log("Generated", nftInfo.imageInfo.length, "images");
+  console.log("Generated", nftInfo?.imageInfo?.length, "images");
   console.log("#########################################");
   console.log();
 

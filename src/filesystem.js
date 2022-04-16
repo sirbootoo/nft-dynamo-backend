@@ -1,6 +1,7 @@
 const fs = require("fs");
 const Moralis = require("moralis/node");
 const request = require("request");
+const path = require("path");
 
 
 const runDNAFile = data => {
@@ -34,7 +35,7 @@ const runDNAFile = data => {
 
     // get rarity from to config to create NFT as
     let rarity = getRarity(editionCount, editionSize);
-    
+
     // create unique Dna
     dna.newDna = createUniqueDna(layers, rarity, rarityWeights, dnaListByRarity);
     dnaListByRarity[rarity].push(dna.newDna);
@@ -61,61 +62,78 @@ const runDNAFile = data => {
     editionCount,
     editionSize,
     rarityWeights,
-    imageDataArray
+    imageDataArray,
+    sesID = null
   ) => {
-    const dna = constructLoadedElements(
-      layers,
-      editionCount,
-      editionSize,
-      rarityWeights
-    );
+    try {
+      const dna = constructLoadedElements(
+        layers,
+        editionCount,
+        editionSize,
+        rarityWeights
+      );
 
-    let attributesList = [];
+      let attributesList = [];
 
-    await Promise.all(dna.loadedElements).then(elementArray => {
-      // create empty image
-      ctx.clearRect(0, 0, width, height);
-      // draw a random background color
-      drawBackground(ctx, width, height);
-      // store information about each layer to add it as meta information
-      attributesList = [];
-      // draw each layer
-      elementArray.forEach(element => {
-        drawElement(ctx, element);
-        let selectedElement = element.layer.selectedElement;
-        attributesList.push({
-          name: selectedElement.name,
-          rarity: selectedElement.rarity
+      await Promise.all(dna.loadedElements).then(elementArray => {
+        // create empty image
+        ctx.clearRect(0, 0, width, height);
+        // draw a random background color
+        drawBackground(ctx, width, height);
+        // store information about each layer to add it as meta information
+        attributesList = [];
+        // draw each layer
+        console.log(elementArray, "=============== elementArray ===============\n\n");
+        elementArray.forEach(element => {
+          drawElement(ctx, element);
+          let selectedElement = element.layer.selectedElement;
+          attributesList.push({
+            name: selectedElement.name,
+            rarity: selectedElement.rarity
+          });
         });
+        // add an image signature as the edition count to the top left of the image
+
+        if (editionSize < 5) {
+          signImage(ctx, `https://nftdynamo.xyz`);
+        } else {
+          signImage(ctx, '');
+        }
+        // write the image to the output directory
       });
-      // add an image signature as the edition count to the top left of the image
-      
-      if(editionSize < 5) {
-        signImage(ctx, `https://nftdynamo.xyz`);
-      } else {
-        signImage(ctx, '');
+
+      const base64ImgData = canvas.toBuffer();
+      const base64 = base64ImgData.toString("base64");
+
+      let filename = editionCount.toString() + ".png";
+      let filetype = "image/png";
+
+      console.log(filename, filetype, attributesList, "================ file name ====================\n\n");
+
+      console.log(canvas.toBuffer(filetype), " ++++++++++++++++++++++++++ canvas.toBuffer(filetype) ++++++++++++++++++++++++++\n\n");
+
+      // save locally as file
+      const outputDir  = path.resolve(__dirname, `../output/${sesID}`);
+      const outputFolderExist = fs.existsSync(outputDir);
+      console.log(outputDir, outputFolderExist, "======================= outputFolderExist ====================\n\n")
+      if (!outputFolderExist) {
+        fs.mkdirSync(outputDir, { recursive: true });
       }
-      // write the image to the output directory
-    });
+      await fs.writeFileSync(outputDir+"/"+filename, canvas.toBuffer(filetype), { flag: 'w+' });
 
-    const base64ImgData = canvas.toBuffer();
-    const base64 = base64ImgData.toString("base64");
+      console.log(`Created #${editionCount.toString()}`);
 
-    let filename = editionCount.toString() + ".png";
-    let filetype = "image/png";
+      imageDataArray[editionCount] = {
+        editionCount: editionCount,
+        newDna: dna.newDna,
+        attributesList: attributesList
+      };
 
-    // save locally as file
-    fs.writeFileSync(`./output/${filename}`, canvas.toBuffer(filetype));
-
-    console.log(`Created #${editionCount.toString()}`);
-
-    imageDataArray[editionCount] = {
-      editionCount: editionCount,
-      newDna: dna.newDna,
-      attributesList: attributesList
-    };
-
-    return imageDataArray;
+      return imageDataArray;
+    } catch (err) {
+      console.log(err, "===================== Err =======================");
+      Promise.reject(err);
+    }
   };
 
   // upload to database
@@ -145,7 +163,7 @@ const runDNAFile = data => {
             FileDatabase.set("meta_hash", metaHash);
             FileDatabase.set("image_hash", imageHash);
             FileDatabase.save();
-          } catch (err) {}
+          } catch (err) { }
         }
       });
     }

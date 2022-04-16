@@ -2,15 +2,21 @@ const fs = require("fs");
 const Moralis = require("moralis/node");
 const { default: axios } = require("axios");
 
+const path = require("path");
+
+
 
 const runMetaDataFile = (data) => {
 
   const { saveToDb } = require("./filesystem")(data);
+  const {sesID} = data;
+
+  const outputDir  = path.resolve(__dirname, `../output/${sesID}`);
 
   const { description, baseImageUri } = require("../input/config.js")(data);
   // write metadata locally to json files
   const writeMetaData = metadataList => {
-    fs.writeFileSync("./output/_metadata.json", JSON.stringify(metadataList));
+    fs.writeFileSync(outputDir+"/_metadata.json", JSON.stringify(metadataList));
   };
 
   // add metadata for individual nft edition
@@ -71,14 +77,14 @@ const runMetaDataFile = (data) => {
 
       // save locally as file
       fs.writeFileSync(
-        `./output/${filename}`,
+        `${outputDir}/${filename}`,
         JSON.stringify(metadataList.find(meta => meta.edition == i))
       );
 
       // reads output folder for json files and then adds to IPFS object array
       promiseArray.push(
         new Promise((res, rej) => {
-          fs.readFile(`./output/${id}.json`, (err, data) => {
+          fs.readFile(`${outputDir}/${id}.json`, (err, data) => {
             if (err) rej();
             ipfsArray.push({
               path: `metadata/${paddedHex}.json`,
@@ -119,7 +125,8 @@ const runMetaDataFile = (data) => {
     xAPIKey,
     editionCount,
     editionSize,
-    imageDataArray
+    imageDataArray,
+    sesID = null
   ) => {
     ipfsArray = [];
     promiseArray = [];
@@ -132,7 +139,8 @@ const runMetaDataFile = (data) => {
       // reads output folder for images and adds to IPFS object metadata array (within promise array)
       promiseArray.push(
         new Promise((res, rej) => {
-          fs.readFile(`./output/${id}.png`, (err, data) => {
+          const outputDir  = path.resolve(__dirname, `../output/${sesID}`);
+          fs.readFile(`${outputDir}/${id}.png`, (err, data) => {
             if (err) rej();
             ipfsArray.push({
               path: `images/${paddedHex}.png`,
