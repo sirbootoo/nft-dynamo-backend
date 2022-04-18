@@ -73,9 +73,13 @@ const runMetaDataFile = (data) => {
             JSON.stringify(metadataList.find(meta => meta.edition == i))
           ).toString("base64")
         });
-      } catch (err) { }
+        // metaFile.saveIPFS()
+      } catch (err) {
+        console.log(err)
+      }
 
       // save locally as file
+      console.log("Are you getting here? Yes");
       fs.writeFileSync(
         `${outputDir}/${filename}`,
         JSON.stringify(metadataList.find(meta => meta.edition == i))
@@ -99,7 +103,7 @@ const runMetaDataFile = (data) => {
     // once all promises back then save to IPFS and Moralis database
     return Promise.all(promiseArray).then(() => {
       return axios
-        .post(apiUrl, ipfsArray, {
+        .post(apiUrl+"/ipfs/uploadFolder", ipfsArray, {
           headers: {
             "X-API-Key": xAPIKey,
             "content-type": "application/json",
@@ -111,6 +115,7 @@ const runMetaDataFile = (data) => {
           const metaFolderLink = res.data[0].path.split("00000000")[0];
           saveToDb(metaCID, imageCID, editionSize);
           writeMetaData(metadataList);
+          console.log({metaInfo: res.data, metaCID, metaFolderLink}, "======================= {metaInfo: res.data, metaCID, metaFolderLink} ==================\n\n");
           return {metaInfo: res.data, metaCID, metaFolderLink};
         })
         .catch(err => {
@@ -155,7 +160,7 @@ const runMetaDataFile = (data) => {
     // once all promises then upload IPFS object metadata array
     return Promise.all(promiseArray).then(() => {
       return axios
-        .post(apiUrl, ipfsArray, {
+        .post(apiUrl+"/ipfs/uploadFolder", ipfsArray, {
           headers: {
             "X-API-Key": xAPIKey,
             "content-type": "application/json",
