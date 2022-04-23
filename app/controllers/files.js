@@ -17,9 +17,9 @@ const upload = (req, res) => {
 }
 
 const previewController = async (req, res) => {
-    const { sesID } = req.headers;
+    const { sesid } = req.headers;
     try {
-        const payl = await preview.getIPFSData(sesID);
+        const payl = await preview.getIPFSData(sesid);
         res.json({
             status: 1,
             data: payl
@@ -85,9 +85,6 @@ const generateNFTs = async (req, res) => {
     }
 
 }
-
-
-const getNFTInfoFromDB = async () => { }
 
 module.exports = {
     upload,

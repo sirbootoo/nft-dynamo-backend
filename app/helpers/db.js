@@ -5,7 +5,7 @@ const saveToMongoDB = async (data) => {
 }
 
 const getFromMongoDB = async (sesID) => {
-    return models.session.findOne({
+    return await models.session.findOne({
         sesID,
         type: "generate"
     });
