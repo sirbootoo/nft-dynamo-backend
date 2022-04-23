@@ -113,7 +113,7 @@ const runMetaDataFile = (data) => {
         .then(res => {
           const metaCID = res.data[0].path.split("/")[4];
           const metaFolderLink = res.data[0].path.split("00000000")[0];
-          saveToDb(metaCID, imageCID, editionSize);
+          // saveToDb(metaCID, imageCID, editionSize);
           writeMetaData(metadataList);
           console.log({metaInfo: res.data, metaCID, metaFolderLink}, "======================= {metaInfo: res.data, metaCID, metaFolderLink} ==================\n\n");
           return {metaInfo: res.data, metaCID, metaFolderLink};
@@ -161,6 +161,8 @@ const runMetaDataFile = (data) => {
     return Promise.all(promiseArray).then(() => {
       return axios
         .post(apiUrl+"/ipfs/uploadFolder", ipfsArray, {
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
           headers: {
             "X-API-Key": xAPIKey,
             "content-type": "application/json",

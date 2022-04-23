@@ -10,6 +10,8 @@
   "author": "Daniel Eugene Botha",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "^6.19.6",
+    "@sentry/tracing": "^6.19.6",
     "all": "^0.0.0",
     "axios": "^0.23.0",
     "canvas": "^2.8.0",
@@ -19,6 +21,8 @@
     "extract-zip": "^2.0.1",
     "formidable": "^2.0.1",
     "fs": "0.0.1-security",
+    "mongoose": "^6.3.0",
+    "mongoose-unique-validator": "^3.0.0",
     "moralis": "^0.0.104",
     "multer": "^1.4.4",
     "request": "^2.88.2",

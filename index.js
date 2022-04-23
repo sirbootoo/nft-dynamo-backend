@@ -1,7 +1,12 @@
 const express = require('express');
 const fs = require('fs');
+const mongoose = require('mongoose');
 const path = require('path');
 const multer = require("multer");
+const Sentry = require("@sentry/node");
+const Tracing = require("@sentry/tracing");
+
+
 const uploadDir = path.join(__dirname, '/input');
 const extractDir = path.join(__dirname, '/inputs');
 var cors = require('cors');
@@ -11,6 +16,13 @@ const authMiddle = require("./app/middlewares/auth");
 
 
 require("dotenv").config();
+
+
+main().then(res => console.log("Server connected.")).catch(err => console.log(err));
+
+async function main() {
+    await mongoose.connect('mongodb://localhost:27017/test');
+}
 
 
 if (!fs.existsSync(uploadDir)) {
@@ -40,6 +52,27 @@ const storage = multer.diskStorage({
 
 const app = express();
 
+Sentry.init({
+    dsn: "https://bd83dbc31f6341e5b2e15ea6f9427528@o245931.ingest.sentry.io/6358051",
+    integrations: [
+        // enable HTTP calls tracing
+        new Sentry.Integrations.Http({ tracing: true }),
+        // enable Express.js middleware tracing
+        new Tracing.Integrations.Express({ app }),
+    ],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+});
+
+// RequestHandler creates a separate execution context using domains, so that every
+// transaction/span/breadcrumb is attached to its own Hub instance
+app.use(Sentry.Handlers.requestHandler());
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler());
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({
@@ -58,6 +91,9 @@ app.get('/', [authMiddle.init], function (req, res) {
 app.post('/upload', [authMiddle.verify, multer({ storage }).single('file')], filesController.upload);
 app.post('/preview', [authMiddle.verify], filesController.preview);
 app.post('/generate', [authMiddle.verify], filesController.generateNFTs);
+
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
 
 app.listen((process.env.PORT || 3010), (err) => {
     if (err) throw err;

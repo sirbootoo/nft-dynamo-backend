@@ -1,5 +1,6 @@
 const uploadService = require("../services/upload");
-const NFTService = require("../services/createNFT")
+const NFTService = require("../services/createNFT");
+const models = require("../models");
 
 const upload = (req, res) => {
     try {
@@ -23,19 +24,26 @@ const preview = async (req, res) => {
         layers,
         rarities,
         rarityPercentOptions } = req.body;
-    
+
     let _width = Number(width),
-    _height = Number(height),
-    _editionSize = 1,
-    _layers = layers,
-    _rarities = rarities, 
-    { sesid } = req.headers,
-    _description = `${sesid} preview`;
+        _height = Number(height),
+        _editionSize = 1,
+        _layers = layers,
+        _rarities = rarities,
+        { sesid } = req.headers,
+        _description = `${sesid} preview`;
 
     console.log("sesID = ", sesid);
 
-    const data = {_width, _height, _description, _editionSize, _layers, _rarities, sesID: sesid};
-    console.log("\n\n", data, "<=============== Inside controller \n\n");
+    const data = { 
+        _width, 
+        _height, 
+        _description, 
+        _editionSize, 
+        _layers, 
+        _rarities, 
+        sesID: sesid, 
+        _type: "preview" };
     try {
         let payload = await NFTService.generateNFTs(data);
         if (!payload || (payload && payload.status === 0)) {
@@ -55,6 +63,7 @@ const preview = async (req, res) => {
 
 const generateNFTs = async (req, res) => {
     const {
+        name,
         width,
         height,
         description,
@@ -62,19 +71,29 @@ const generateNFTs = async (req, res) => {
         layers,
         rarities,
         rarityPercentOptions } = req.body;
-    
+
     let _width = Number(width),
-    _height = Number(height),
-    _description = description.trim(),
-    _editionSize = Number(editionSize),
-    _layers = layers,
-    _rarities = rarities, 
-    { sesid } = req.headers;
+        _height = Number(height),
+        _description = description.trim(),
+        _editionSize = Number(editionSize),
+        _layers = layers,
+        _rarities = rarities,
+        _name = name,
+        { sesid } = req.headers;
 
     console.log("sesID = ", sesid);
 
-    const data = {_width, _height, _description, _editionSize, _layers, _rarities, sesID: sesid};
-    console.log("\n\n", data, "<=============== Inside controller \n\n");
+    const data = { 
+        _width, 
+        _height, 
+        _description, 
+        _name, 
+        _editionSize, 
+        _layers, 
+        _rarities, 
+        sesID: sesid, 
+        _type: "generate" 
+    };
     try {
         let payload = await NFTService.generateNFTs(data);
         if (!payload || (payload && payload.status === 0)) {
@@ -92,6 +111,9 @@ const generateNFTs = async (req, res) => {
     }
 
 }
+
+
+const getNFTInfoFromDB = async () => { }
 
 module.exports = {
     upload,
