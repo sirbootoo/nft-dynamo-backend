@@ -1,6 +1,7 @@
 const uploadService = require("../services/upload");
 const NFTService = require("../services/createNFT");
 const models = require("../models");
+const preview = require("../helpers/preview");
 
 const upload = (req, res) => {
     try {
@@ -15,42 +16,15 @@ const upload = (req, res) => {
     }
 }
 
-const preview = async (req, res) => {
-    const {
-        width,
-        height,
-        description,
-        editionSize,
-        layers,
-        rarities,
-        rarityPercentOptions } = req.body;
-
-    let _width = Number(width),
-        _height = Number(height),
-        _editionSize = 1,
-        _layers = layers,
-        _rarities = rarities,
-        { sesid } = req.headers,
-        _description = `${sesid} preview`;
-
-    console.log("sesID = ", sesid);
-
-    const data = { 
-        _width, 
-        _height, 
-        _description, 
-        _editionSize, 
-        _layers, 
-        _rarities, 
-        sesID: sesid, 
-        _type: "preview" };
+const previewController = async (req, res) => {
+    const { sesID } = req.headers;
     try {
-        let payload = await NFTService.generateNFTs(data);
-        if (!payload || (payload && payload.status === 0)) {
-            res.statusCode = 400;
-        }
-        res.json(payload);
-    } catch (err) {
+        const payl = await preview.getIPFSData(sesID);
+        res.json({
+            status: 1,
+            data: payl
+        });
+    } catch(err) {
         res.statusCode = 500;
         res.json({
             status: 0,
@@ -117,6 +91,6 @@ const getNFTInfoFromDB = async () => { }
 
 module.exports = {
     upload,
-    preview,
+    previewController,
     generateNFTs
 }

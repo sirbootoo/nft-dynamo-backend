@@ -1,5 +1,6 @@
 const fs = require("fs");
 const uuid4 = require("uuid4");
+const db = require("./db");
 
 
 // Helper function
@@ -13,7 +14,17 @@ const sessionGen = () => {
     return id;
 }
 
+const getIPFSData = async (sesID) => {
+    try {
+        const payload = await db.getFromMongoDB(sesID);
+        return payload;
+    } catch(err) {
+        Promise.reject(err);
+    }
+}
+
 
 module.exports = {
-    sessionGen
+    sessionGen,
+    getIPFSData
 }
