@@ -96,7 +96,8 @@ app.get('/', [authMiddle.init], function (req, res) {
     res.sendFile(__dirname + '/app/views/index.html');
 });
 app.post('/upload', [authMiddle.verify, multer({ storage }).single('file')], filesController.upload);
-app.get('/preview', [authMiddle.verify], filesController.previewController);
+app.get('/view', [authMiddle.verify], filesController.view);
+app.post('/preview', [authMiddle.verify], filesController.previewController);
 app.post('/generate', [authMiddle.verify], filesController.generateNFTs);
 
 // The error handler must be before any other error middleware and after all controllers

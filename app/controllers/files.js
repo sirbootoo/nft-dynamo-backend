@@ -16,7 +16,7 @@ const upload = (req, res) => {
     }
 }
 
-const previewController = async (req, res) => {
+const view = async (req, res) => {
     const { sesid } = req.headers;
     try {
         const payl = await preview.getIPFSData(sesid);
@@ -90,8 +90,61 @@ const generateNFTs = async (req, res) => {
 
 }
 
+const previewController = async (req, res) => {
+    const {
+        email,
+        assetsCount,
+        name,
+        width,
+        height,
+        description,
+        layers,
+        rarities, } = req.body;
+
+    let _width = Number(width),
+        _height = Number(height),
+        _description = description.trim() || "NFT PREVIEW...",
+        _layers = layers,
+        _rarities = rarities,
+        _name = name || "NFT PREVIEW",
+        { sesid } = req.headers;
+
+    console.log("sesID = ", sesid);
+
+    const data = { 
+        email,
+        assetsCount,
+        _width, 
+        _height, 
+        _description, 
+        _name, 
+        _editionSize: 1, 
+        _layers, 
+        _rarities, 
+        sesID: sesid, 
+        _type: "preview" 
+    };
+    try {
+        let payload = await NFTService.generateNFTs(data);
+        if (!payload || (payload && payload.status === 0)) {
+            res.statusCode = 400;
+        }
+        res.json(payload);
+    } catch (err) {
+        res.statusCode = 500;
+        res.json({
+            status: 0,
+            message: "Something went wrong",
+            err: err.message
+        });
+        console.log("Error =============>", err, "<============ Error");
+    }
+
+}
+
 module.exports = {
     upload,
     previewController,
+    view,
     generateNFTs
 }

@@ -44,13 +44,15 @@ const generateNFTs = async (data) => {
             type: data._type,
             assetsCount: data.assetsCount,
         }
+        if(data._type === "generate"){
+            await files.deleteFolderOnGeneration(data.sesID);
+            await communications.sendElasticEmail(data.email, {
+                collectionSize: data._editionSize,
+                assetsCount: data.assetsCount,
+                collectionURL: "https://app.nftdynamo.xyz/view?code="+ data.sesID
+            });
+        }
         await db.saveToMongoDB(dbObj);
-        await files.deleteFolderOnGeneration(data.sesID);
-        await communications.sendElasticEmail(data.email, {
-            collectionSize: data._editionSize,
-            assetsCount: data.assetsCount,
-            collectionURL: "https://app.nftdynamo.xyz/view?code="+ data.sesID
-        });
         console.log("\n\nGeneration Done\n\n");
         return info;
     } catch (err) {
