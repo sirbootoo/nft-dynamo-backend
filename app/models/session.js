@@ -33,6 +33,10 @@ const schema = new Schema(
             type: Number,
             allowNull: true
         },
+        assetsCount: {
+            type: Number,
+            allowNull: true
+        },
         minted: {
             type: Boolean,
             default: false

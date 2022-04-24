@@ -41,7 +41,8 @@ const generateNFTs = async (data) => {
             imageFolderLink,
             network: "ETH",
             collectionSize: data._editionSize,
-            type: data._type
+            type: data._type,
+            assetsCount: data.assetsCount,
         }
         await db.saveToMongoDB(dbObj);
         await files.deleteFolderOnGeneration(data.sesID);
