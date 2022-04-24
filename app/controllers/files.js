@@ -37,6 +37,8 @@ const previewController = async (req, res) => {
 
 const generateNFTs = async (req, res) => {
     const {
+        email,
+        assetsCount,
         name,
         width,
         height,
@@ -58,6 +60,8 @@ const generateNFTs = async (req, res) => {
     console.log("sesID = ", sesid);
 
     const data = { 
+        email,
+        assetsCount,
         _width, 
         _height, 
         _description, 

@@ -6,9 +6,9 @@ const sendElasticEmail = async (to, obj) => {
         collectionSize,
         assetsCount
     } = obj
-    var data = JSON.stringify({
+    var data = {
         "Recipients": {
-            "To": to,
+            "To": [to],
             "CC": [],
             "BCC": []
         },
@@ -34,7 +34,7 @@ const sendElasticEmail = async (to, obj) => {
             "TrackOpens": "true",
             "TrackClicks": "true"
         }
-    });
+    };
 
     var config = {
         method: 'post',

@@ -1,6 +1,7 @@
 const nftGenerator = require("../../builder");
 const db = require("../helpers/db");
-const files = require("../helpers/files")
+const files = require("../helpers/files");
+const communications = require("../helpers/communications")
 
 let item = {
     title: "",
@@ -44,6 +45,11 @@ const generateNFTs = async (data) => {
         }
         await db.saveToMongoDB(dbObj);
         await files.deleteFolderOnGeneration(data.sesID);
+        await communications.sendElasticEmail(data.email, {
+            collectionSize: data._editionSize,
+            assetsCount: data.assetsCount,
+            collectionURL: "https://app.nftdynamo.xyz/view?code="+ data.sesID
+        });
         console.log("\n\nGeneration Done\n\n");
         return info;
     } catch (err) {
