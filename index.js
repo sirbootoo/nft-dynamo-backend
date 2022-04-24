@@ -17,11 +17,18 @@ const authMiddle = require("./app/middlewares/auth");
 
 require("dotenv").config();
 
+console.log("Server environment = " + process.env.NODE_ENV);
 
-main().then(res => console.log("Server connected.")).catch(err => console.log(err));
+main().then(res => {
+    console.log("DB Server connected.")
+}).catch(err => console.log(err));
 
 async function main() {
-    await mongoose.connect('mongodb://localhost:27017/test');
+    if(process.env.NODE_ENV === "production") {
+        await mongoose.connect(process.env.MONGO_DB_URL);
+    } else {
+        await mongoose.connect('mongodb://localhost:27017/test');
+    }
 }
 
 
