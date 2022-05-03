@@ -19,9 +19,7 @@ let NFTDB = [];
 
 const preview = async (sesID) => {
     try {
-        console.log(sesID, "================ sesID ==============\n\n")
         const info = await nftGenerator({ sesID });
-        console.log(info, "================== info =====================\n\n");
         return info;
     } catch (err) {
         console.log(err, "------------ Err --------------- \n\n");

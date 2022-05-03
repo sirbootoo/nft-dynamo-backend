@@ -29,7 +29,6 @@ const verify = (req, res, next) => {
         res.statusCode = 401;
         return res.json("Trying to be funny, right?");
     }
-    console.log(sesid, req.headers, "<================= sesid");
     return next();
 }
 
